@@ -1,51 +1,62 @@
 #include <iostream>
 #include <cstdlib>
-#include <ctime>
-
 using namespace std;
 
-
-void init_array(int a[], int n){
-    for (int i=0; i<n; i++){
-        srand(n+i);
-        int num = rand()%999+1;
-        a[i] = num;
+int ***makeArray3D(int *sz){
+    int n1 = sz[0], n2 = sz[1], n3 = sz[2];
+    int ***arr = new int **[n1];
+    for (int i=0; i<n1; i++){
+        arr[i] = new int *[n2];
+        for (int j=0; j<n2; j++){
+            arr[i][j] = new int[n3];
+        }
     }
+    return arr;
+}
+void destroyArray3D(int ***arr, int *sz){
+    int n1 = sz[0];
+    int n2 = sz[1];
+    for (int i=0; i<n1; i++){
+        for (int j=0; j<n2; j++){
+            delete[] arr[i][j];
+        }
+        delete[] arr[i];
+    }
+    delete[] arr;
 }
 
-int sum_array1(int a[], int n){
-    int Sum=0;
-    for (int i=0; i<n; i++){
-        Sum += a[i];
-    }
-    return Sum;
-}
-
-int main(int argc, char *argv[]){
-    if(argc < 2) {
-        cout << "one command line argument needed\n";
+int main(int argc , char *argv[]){
+    if (argc < 2){
+        cout << "usage : ./str 1d 2d 3d ... nd \n";
         return -1;
     }
 
-    int n = atoi(argv[1]);
-    n = (n<1)? 1:n;
-    n = (n>10)? 10:n;
+    int i, dim = argc-1;
+    int *size = new int[dim];
 
-    int arr[n];
-
-    int *a = arr;
-    if (!a) {
-        cout << "allocation failed. \n";
-        return -1;
+    for (i=1; i<argc; i++){
+        size[i-1] = atoi(argv[i]);
     }
-    int s;
+    int ***arr3d = NULL;
 
-    init_array(a,n);
-
-    for (int i=0; i<n; i++){
-        cout << a[i] << " ";
+    arr3d = makeArray3D(size);
+    for (int i=0; i<size[0]; i++){
+        for (int j=0; j<size[1]; j++){
+            for (int k=0; k<size[2]; k++){
+                arr3d[i][j][k] = (i*size[1]+j)*size[2]+k;
+            }
+        }
     }
-
-    s = sum_array1(a,n);
-    cout << endl << s << endl;
+    for (int i=0; i<size[0]; i++){
+        cout << "i :  " << i << endl;
+        for (int j=0; j<size[1]; j++){
+            for (int k=0; k<size[2]; k++){
+                cout << arr3d[i][j][k] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+    }
+    destroyArray3D(arr3d, size);
+    return 0;
 }
